@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://natxovz.github.io/agente_registro/sitemap.xml
