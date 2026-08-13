@@ -1,0 +1,30 @@
+name: Submit to IndexNow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sitemap.xml'
+      - '**.html'
+
+jobs:
+  indexnow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Extract URLs from sitemap and submit to IndexNow
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+          HOST: natxovz.github.io
+        run: |
+          URLS=$(grep -oP '(?<=<loc>).*?(?=</loc>)' sitemap.xml | jq -R . | jq -s .)
+          
+          curl -s -o /dev/null -w "%{http_code}\n" -X POST "https://api.indexnow.org/indexnow" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"host\": \"${HOST}\",
+              \"key\": \"${INDEXNOW_KEY}\",
+              \"urlList\": ${URLS}
+            }"
